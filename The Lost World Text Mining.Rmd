@@ -1,0 +1,15 @@
+---
+title: "The Lost World Text Mining"
+author: "Wuji Shan"
+date: "11/29/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(httr)
+library(tnum)
+library(tidytext)
+library(gutenbergr)
+```
