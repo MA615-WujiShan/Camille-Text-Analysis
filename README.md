@@ -4,8 +4,8 @@ Here is MA 615 Assignment 4 - Text Analysis.
 
 The book chosen for this assignment is:  
 
-Name: The Lost World  
+Name: Les Misérables
 
-Author: Doyle, Arthur Conan  
+Author: Victor Hugo
 
-URL: https://www.gutenberg.org/ebooks/139  
+URL: https://www.gutenberg.org/ebooks/135
