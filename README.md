@@ -1,4 +1,4 @@
-# The Lost World Text Analysis
+# Les Misérables Text Analysis
 
 Here is MA 615 Assignment 4 - Text Analysis.
 
