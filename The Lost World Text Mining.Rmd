@@ -1,5 +1,5 @@
 ---
-title: "The Lost World Text Mining"
+title: "Camille Text Mining"
 author: "Wuji Shan"
 date: "11/29/2021"
 output: pdf_document
@@ -8,8 +8,74 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(tidyr)
 library(httr)
 library(tnum)
 library(tidytext)
 library(gutenbergr)
+library(textdata)
+library(janeaustenr)
+library(dplyr)
+library(stringr)
+library(scales)
+library(ggplot2)
+library(wordcloud)
+library(reshape2)
 ```
+
+```{r}
+Cami <- gutenberg_download(1608)
+```
+
+```{r}
+newCami <- Cami %>%
+  mutate(linenumber = row_number()) %>%
+  select(-gutenberg_id) %>%
+  mutate(chapter = cumsum(str_detect(text, 
+                                     regex("^chapter [\\divxlc]",
+                                           ignore_case = TRUE))))
+```
+
+```{r}
+tidy_Cami <- newCami %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+tidy_Cami %>%
+  count(word, sort = TRUE) 
+```
+
+# Sentiment Analysis
+
+## bing
+```{r}
+get_sentiments("bing")
+bing_neg <- get_sentiments("bing") %>% 
+  filter(sentiment == "negative")
+```
+
+```{r}
+tidy_Cami %>%
+  inner_join(bing_neg) %>%
+  count(word, sort = TRUE)
+
+Cami_sentiment <- tidy_Cami %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(index = chapter, sentiment) %>%
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) %>% 
+  mutate(sentiment = positive - negative)
+
+ggplot(Cami_sentiment, aes(index, sentiment)) +
+  geom_col(show.legend = FALSE)
+```
+
+## afinn
+```{r}
+afinn <- tidy_Cami %>% 
+  inner_join(get_sentiments("afinn")) %>% 
+  group_by(index = linenumber %/% 80) %>% 
+  summarise(sentiment = sum(value)) %>% 
+  mutate(method = "AFINN")
+```
+
+
