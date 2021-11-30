@@ -50,7 +50,21 @@ tidy_Cami %>%
 
 # Sentiment Analysis
 
+## nrc
+
+```{r}
+#textdata::lexicon_nrc(delete = TRUE)
+#nrc <- textdata::lexicon_nrc()
+nrc_joy <- get_sentiments("nrc") %>% 
+  filter(sentiment == "joy")
+
+tidy_Cami %>%
+  inner_join(nrc_joy) %>%
+  count(word, sort = TRUE)
+```
+
 ## bing
+
 ```{r}
 get_sentiments("bing")
 bing_neg <- get_sentiments("bing") %>% 
@@ -73,6 +87,7 @@ ggplot(Cami_sentiment, aes(index, sentiment)) +
 ```
 
 ## afinn
+
 ```{r}
 afinn <- tidy_Cami %>% 
   inner_join(get_sentiments("afinn")) %>% 
@@ -81,20 +96,49 @@ afinn <- tidy_Cami %>%
   mutate(method = "AFINN")
 ```
 
-## nrc
+## compare the three sentiment dictionaries
+
 ```{r}
-#nrc_joy <- get_sentiments("nrc") %>% 
-#  filter(sentiment == "joy")
+bing_and_nrc <- bind_rows(
+  tidy_Cami %>% 
+    inner_join(get_sentiments("bing")) %>%
+    mutate(method = "Bing et al."),
+  tidy_Cami %>% 
+    inner_join(get_sentiments("nrc") %>% 
+                 filter(sentiment %in% c("positive", 
+                                         "negative"))
+    ) %>%
+    mutate(method = "NRC")) %>%
+  count(method, index = linenumber %/% 80, sentiment) %>%
+  pivot_wider(names_from = sentiment,
+              values_from = n,
+              values_fill = 0) %>% 
+  mutate(sentiment = positive - negative)
+```
+
+```{r}
+bind_rows(afinn, 
+          bing_and_nrc) %>%
+  ggplot(aes(index, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~method, ncol = 1, scales = "free_y")
 ```
 
 ## later
+
+```{r}
+get_sentiments("nrc") %>% 
+  filter(sentiment %in% c("positive", "negative")) %>% 
+  count(sentiment)
+```
+
 ```{r}
 get_sentiments("bing") %>% 
   count(sentiment)
 ```
 
+# 2.4 Most common positive and negative words
 ```{r}
-# most common positive and negative words
 bing_word_counts <- tidy_Cami %>%
   inner_join(get_sentiments("bing")) %>%
   count(word, sentiment, sort = TRUE) %>%
@@ -102,6 +146,7 @@ bing_word_counts <- tidy_Cami %>%
 
 bing_word_counts
 ```
+
 ```{r}
 bing_word_counts %>%
   group_by(sentiment) %>%
