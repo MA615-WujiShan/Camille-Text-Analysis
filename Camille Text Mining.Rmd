@@ -26,6 +26,7 @@ library(reshape2)
 Book: Camille (LA DAME AUX CAMILIAS)  
 Author: Alexandre Dumas  
 
+# Task One
 ```{r}
 Cami <- gutenberg_download(1608)
 ```
@@ -48,7 +49,7 @@ tidy_Cami %>%
   count(word, sort = TRUE) 
 ```
 
-# Sentiment Analysis
+# Task Two: Sentiment Analysis
 
 ## nrc
 
@@ -137,7 +138,7 @@ get_sentiments("bing") %>%
   count(sentiment)
 ```
 
-# 2.4 Most common positive and negative words
+## Most common positive and negative words
 ```{r}
 bing_word_counts <- tidy_Cami %>%
   inner_join(get_sentiments("bing")) %>%
@@ -160,7 +161,7 @@ bing_word_counts %>%
        y = NULL)
 ```
 
-# 2.5 Wordclouds
+## Wordclouds
 
 ```{r}
 tidy_Cami %>%
