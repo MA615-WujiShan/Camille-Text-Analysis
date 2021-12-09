@@ -1,5 +1,5 @@
 ---
-title: "Task Three"
+title: "Task THREE"
 author: "Wuji Shan"
 date: "12/7/2021"
 output: pdf_document
@@ -13,7 +13,8 @@ pacman::p_load(gutenbergr, tidytext, magrittr, textdata, dplyr, stringr, tidyver
                tidyr, scales, reshape2, ggplot2, tinytex, latexpdf, sentimentr)
 ```
 
-# Task Three
+
+# Download the book
 
 ```{r, echo = TRUE}
 library(tnum)
@@ -28,6 +29,8 @@ Cami_book <- gutenberg_download(1608)
 #write.table(Cami_book, "Cami_book.txt")
 book_fix <- read.table("Cami_book.txt", header = T)
 ```
+
+# Load the book Camille into the test2 number space
 
 ```{r, echo = TRUE}
 # tnBooksFromLines(book_fix$text, "Alexandre_Dumas/Camille_Book92")
@@ -59,14 +62,19 @@ Cami_sentence <- Cami_sentence %>% mutate_at(c('section','paragraph','sentence')
                                              %>% as.numeric())
 ```
 
-```{r, echo = TRUE}
+
+```{r, echo = TRUE, fig.cap = "Sentiments Number in Each Section"}
 sentence_out <- Cami_sentence %>% dplyr::mutate(sentence_split = get_sentences(string.value)) %$%
     sentiment_by(sentence_split, list(section))
 
 plot(sentence_out)
 ```
+Figure 1:  
 
-## Compare 
+This graph shows the sentiments score group in each section via using sentimentr and sorted the average sentiment score from high to low. Range -1 ~ 0 of x-axis represents negative words, and range 0 ~ 1 represents positive words. We can observe that positive words appear more than negative words in book Camille. Moreover, group 12 contains most sentiment words and section 22 has the least.
+
+
+# Compare the bag of words analysis in Task TWO with that from TN
 
 ```{r, echo = TRUE}
 # create a new bing with index=chapter
@@ -90,6 +98,7 @@ new_bing2 <- new_bing %>%
 colnames(new_bing2)[2]='section'
 ```
 
+
 ```{r, echo = TRUE}
 # scale sentiment to keep unit same 
 sentence_out <- sentence_out %>% mutate(sentimentr_scale = scale(ave_sentiment))
@@ -101,12 +110,29 @@ sentence_out_2method <- left_join(sentence_out, new_bing2, by='section') %>%
 # use pivot longer for ggplot
 sentence_out_2method_plot <- sentence_out_2method %>% 
   pivot_longer(cols = c('sentimentr_scale','bing_scale'), names_to = 'sentiment')
+```
 
+```{r, echo = TRUE, fig.cap = "Compare two methods used in Task TWO and Task THREE"}
 # create barplot to compare
 sentence_out_2method_plot %>% ggplot(aes(y = value,x = factor(section))) +
   geom_bar(aes(fill = factor(sentiment)), stat = 'identity', position = "dodge",width = 0.7) + 
   theme_bw()
 ```
+Figure 2: 
+
+Because of two different methods, it is hard to compare sentimentr and BING lexicon directly. Hence, I put two variable into the same criteria via using scale function. After refining the scale, I plotted a bar plot. From Figure 2, we can observe that among 27 chapters,the 11 chapters' sentiment outcome of BING scale sentimentr scale are opposite.  
+
+At the beginning, the sentiment's bias is negative because Marguerite was from countryside and her original family was very poor. During the mid-development of the story, Marguerite and Armand traveled together living a life with respect and love, so the sentiment now is positive. At the end part, this couple were forced to forced to leave each other with misunderstanding, leading to the negative sentiment trend.  
+
+Therefore, I believe BING lexicon method fits the novel storyline better than sentimentr.
 
 
+
+# Reference:  
+
+1. Jin, Yuli, https://github.com/MA615-Yuli/MA615_assignment4_new
+
+2. https://www.gutenberg.org/ebooks/1608
+
+3. https://www.tidytextmining.com/sentiment.html
 
