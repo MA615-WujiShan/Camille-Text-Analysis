@@ -110,7 +110,7 @@ Figure 1:
 
 It's a plot showing sentiment plot of BING lexicon. From Figure 1, it is obvious the first ten chapters and final ten chapters show the negative pattern of sentiment, but the mid ten chapter show the positive sentiment pattern, following the overall development of the novel storyline, which will be explained in detail in Figure 2 description.
 
-```{r, echo = FALSE, fig.cap = "Sentiment plot of BING lexicon"}
+```{r, echo = FALSE}
 # plot these sentiment scores
 # plot against the index on the x-axis that keeps track of narrative time in sections of text
 ggplot(Cami_sentiment, aes(index, sentiment)) +
@@ -158,7 +158,7 @@ Figure 2:
 It's a plot binding estimate for each sentiment lexicons (nrc, bing, afinn) together. From Figure 2, it is obvious that the pattern of the sentiment change is corresponding to the development of the novel narrative. At the beginning, the sentiment's bias is negative because Marguerite was from countryside and her original family was very poor. During the mid-development of the story, Marguerite and Armand traveled together living a life with respect and love, so the sentiment now is positive. At the end part, this couple were forced to forced to leave each other with misunderstanding, leading to the negative sentiment trend. Although NRC did very well in the positive mid part, considering the whole pattern change of the story, BING is the best fit between the plotline of the book. 
 
 
-```{r, echo = FALSE, fig.cap = "Sentiment Plot Binding 3 Lexicons"}
+```{r, echo = FALSE}
 # bind estimate for each sentiment lexicon together and visualize them
 bind_rows(afinn, 
           bing_and_nrc) %>%
@@ -195,7 +195,7 @@ Figure 3:
 
 It's a plot showing the number of words contributed to each sentiment (positive and negative). Figure 3 shows only the top ten frequent positive and negative sentiment words in the book. We can observe that positive words contributes more to sentiment than negative words. Additionally, in the book Camille, the most frequent negative word is "poor", which appears about 55 times; the most frequent positive word is "love", which appears about 270 times. One interesting finding is that 4 of top ten frequent positive words are all related to love, which reflects more the topic of the novel.
 
-```{r, echo = FALSE, fig.cap = "Words' Contribution to Each Sentiment"}
+```{r, echo = FALSE}
 # show that above visually
 bing_word_counts %>%
   group_by(sentiment) %>%
@@ -205,7 +205,8 @@ bing_word_counts %>%
   ggplot(aes(n, word, fill = sentiment)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~sentiment, scales = "free_y") +
-  labs(x = "Contribution to sentiment",
+  labs(title = "Words' Contribution to Each Sentiment",
+       x = "Contribution to sentiment",
        y = NULL)
 ```
 \pagebreak
@@ -214,7 +215,7 @@ Figure 4:
 
 It's a Word Cloud graph showing the most common words in the book: marguerite (name of the main character), love, prudence, woman, father, time and etc.
 
-```{r, echo = FALSE, warning = FALSE, fig.cap = "Wordcloud - Most Common Words"}
+```{r, echo = FALSE, warning = FALSE}
 ## b. Wordclouds
 
 
@@ -230,7 +231,7 @@ Figure 5:
 
 It's a Word Cloud graph showing the most common positive and negative words via making the sentiment analysis to tag positive and negative words. We can observe that positive words - with gray color - are more than negative words, which corresponds to responses of figure 1, 2 and 3 as well.
 
-```{r, echo = FALSE, warning = FALSE, fig.cap = "Sentiment Wordcloud"}
+```{r, echo = FALSE, warning = FALSE}
 # do the sentiment analysis to tag positive and negative words and then find the most common positive and negative words
 tidy_Cami %>%
   inner_join(get_sentiments("bing")) %>%
@@ -268,7 +269,7 @@ tidy_Cami %>%
 
 Here, I decided to use Loughran-McDonald sentiment lexicon in textdata package.
 
-```{r, echo = FALSE, fig.cap = "Loughran-McDonald lexicon sentiment"}
+```{r, echo = FALSE}
 loughran <- tidy_Cami %>% 
   inner_join(get_sentiments("loughran")) %>%
   mutate(method = "Loughran-McDonald")  %>% 
@@ -280,8 +281,8 @@ loughran <- tidy_Cami %>%
 
 # use ggplot to plot the barplot
 loughran %>% ggplot(aes(index, sentiment, fill = method)) +
-  geom_col(show.legend = FALSE) + labs(title='Loughran-McDonald lexicon')+
-  theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+  geom_col(show.legend = FALSE) + labs(title='Loughran-McDonald lexicon Sentiment')+
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
 ```
 
 From the sentiment plot shown via using Loughran-McDonald lexicon, we can observe that most of sentiment are all negative, so it does not fit the storyline better than other three lexicons: afinn, bing, and nrc.
