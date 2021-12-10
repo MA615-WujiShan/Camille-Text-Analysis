@@ -263,3 +263,25 @@ tidy_Cami %>%
 
 # Chapter 24 has the highest proportion of negative words.
 ```
+
+# Task TWO Extra Credit
+
+Here, I decided to use Loughran-McDonald sentiment lexicon in textdata package.
+
+```{r, echo = FALSE, fig.cap = "Loughran-McDonald lexicon sentiment"}
+loughran <- tidy_Cami %>% 
+  inner_join(get_sentiments("loughran")) %>%
+  mutate(method = "Loughran-McDonald")  %>% 
+  count(method, index = linenumber %/% 80, sentiment) %>% 
+  pivot_wider(names_from = sentiment,
+              values_from = n,
+              values_fill = 0) %>% 
+  mutate(sentiment = positive - negative)
+
+# use ggplot to plot the barplot
+loughran %>% ggplot(aes(index, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) + labs(title='Loughran-McDonald lexicon')+
+  theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+From the sentiment plot shown via using Loughran-McDonald lexicon, we can observe that most of sentiment are all negative, so it does not fit the storyline better than other three lexicons: afinn, bing, and nrc.
