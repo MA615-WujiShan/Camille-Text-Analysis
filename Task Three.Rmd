@@ -126,13 +126,44 @@ At the beginning, the sentiment's bias is negative because Marguerite was from c
 
 Therefore, I believe BING lexicon method fits the novel storyline better than sentimentr.
 
+# Extra Credit
 
+Marguerite and Armand are female and male main characters of the book Camille.     
+
+This table shows the number of how many times each character appears in each chapter:  
+
+```{r}
+# use regular expression to find two main characters
+Cami_sentence_ch <- Cami_sentence %>% mutate(Marguerite = str_match(Cami_sentence$string.value, regex('([Mm]arguerite)'))[,1],
+                         Armand = str_match(Cami_sentence$string.value, regex('(Armand)'))[,1])
+
+# use sentiment_by to get the score
+score <- Cami_sentence_ch %>% 
+  dplyr::mutate(sentence_split = get_sentences(string.value)) %$% 
+  sentiment_by(sentence_split) %>% `$`(ave_sentiment)
+
+# count two characters' time in each chapter
+Cami_sentence_ch$score <- score
+time1 <- Cami_sentence_ch %>% group_by(section) %>% summarise(Marguerite = sum(Marguerite %>% is.na() %>% `!`()),
+                                                       Armand = sum(Armand%>% is.na() %>% `!`()))
+knitr::kable(time1,'simple')
+```
+
+This table is the number of how many times both characters appear in the same paragraphs:  
+
+```{r}
+# use group by to display the result
+time2 <- Cami_sentence_ch %>% group_by(section, paragraph) %>% 
+  summarise(both = sum(Marguerite %>% is.na() %>% `!`() & Armand%>% is.na() %>% `!`() ))
+
+knitr::kable(time2 %>% filter(both > 0),'simple')
+```
 
 # Reference:  
 
 1. Jin, Yuli, https://github.com/MA615-Yuli/MA615_assignment4_new
 
-2. https://www.gutenberg.org/ebooks/1608
+2. Gutenberg, https://www.gutenberg.org/ebooks/1608
 
-3. https://www.tidytextmining.com/sentiment.html
+3. Text Mining in R, https://www.tidytextmining.com/sentiment.html
 
